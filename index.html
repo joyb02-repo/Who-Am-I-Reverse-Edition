@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Who Am I? Reverse Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#ffe66d;--bg2:#ff6b9d;--bg3:#6c5ce7;--ink:#1d1340;--card:#ffffffee;--card2:#fff;--line:#1d1340;--yes:#00b894;--no:#e84393;--pop:#ff9f1c;--blue:#2d9cff;--muted:#5b5280;
+--head:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Space Grotesk',system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#2a0f5c;--bg2:#7a1fa2;--bg3:#0b3b8c;--ink:#fff6e0;--card:#1a1038ee;--card2:#241551;--line:#ffd93d;--muted:#b9aee6;--yes:#2ee6b0;--no:#ff6fb5;--pop:#ffb347;--blue:#5db8ff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg1:#2a0f5c;--bg2:#7a1fa2;--bg3:#0b3b8c;--ink:#fff6e0;--card:#1a1038ee;--card2:#241551;--line:#ffd93d;--muted:#b9aee6;--yes:#2ee6b0;--no:#ff6fb5;--pop:#ffb347;--blue:#5db8ff;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;font-family:var(--body);color:var(--ink);background:var(--bg3);position:relative;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3),var(--bg1));background-size:300% 300%;animation:flow 14s ease infinite}
+.bg::before,.bg::after{content:"";position:absolute;inset:-60px;opacity:.28;animation:drift 18s linear infinite}
+.bg::before{background-image:radial-gradient(circle,var(--ink) 3px,transparent 3.5px);background-size:34px 34px}
+.bg::after{background-image:repeating-linear-gradient(45deg,transparent 0 22px,var(--card2) 22px 26px);background-size:auto;animation-duration:26s;animation-direction:reverse;opacity:.16}
+.bg.p1::before{background-image:radial-gradient(circle,var(--ink) 3px,transparent 3.5px);background-size:34px 34px}
+.bg.p2::before{background-image:conic-gradient(from 45deg at 50% 50%,var(--ink) 0 25%,transparent 0 50%,var(--ink) 0 75%,transparent 0);background-size:44px 44px}
+.bg.p3::before{background-image:linear-gradient(var(--ink) 2px,transparent 2px),linear-gradient(90deg,var(--ink) 2px,transparent 2px);background-size:40px 40px}
+.bg.p4::before{background-image:radial-gradient(circle at 0 0,transparent 14px,var(--ink) 15px,var(--ink) 17px,transparent 18px);background-size:36px 36px}
+@keyframes flow{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+@keyframes drift{to{transform:translate(68px,68px)}}
+@media (prefers-reduced-motion:reduce){.bg,.bg::before,.bg::after{animation:none}}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding:10px 0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:3px solid var(--line);border-radius:22px;padding:10px 16px;box-shadow:5px 5px 0 var(--line)}
+h1{font-family:var(--head);font-weight:800;font-size:clamp(18px,4.5vw,28px);margin:0;line-height:1;letter-spacing:-.5px}
+h1 span{background:linear-gradient(90deg,var(--no),var(--pop));-webkit-background-clip:text;background-clip:text;color:transparent}
+.strikes{text-align:right}
+.strikes small{display:block;font-weight:700;font-size:11px;letter-spacing:2px;color:var(--muted)}
+.num{font-family:var(--head);font-weight:800;font-size:38px;line-height:1;color:var(--no)}
+.pips{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:180px;min-height:14px}
+.pip{width:14px;height:14px;border-radius:50%;background:var(--no);border:2px solid var(--line);animation:pop .3s}
+.pip.x{background:var(--pop)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:18px;margin-top:16px;box-shadow:6px 6px 0 var(--line)}
+button{font-family:var(--head);font-weight:800;font-size:16px;color:#1d1340;border:3px solid var(--line);border-radius:16px;padding:12px 18px;cursor:pointer;box-shadow:4px 4px 0 var(--line);transition:transform .1s,box-shadow .1s}
+button:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--line)}
+button:active:not(:disabled){transform:translate(3px,3px);box-shadow:1px 1px 0 var(--line)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.b-start{background:linear-gradient(90deg,#ffd93d,#ff9f1c);font-size:22px;padding:16px 26px;width:100%}
+.b-ask{background:var(--blue)}
+.b-bad{background:var(--no);color:#fff}
+.b-good{background:var(--yes)}
+.mystery{text-align:center}
+.mystery .q{font-family:var(--head);font-weight:800;font-size:clamp(46px,14vw,92px);line-height:1;margin:4px 0;animation:wob 2.4s ease-in-out infinite}
+@keyframes wob{50%{transform:rotate(-4deg) scale(1.06)}}
+.mystery p{margin:6px 0 14px;color:var(--muted);font-weight:500}
+.chat{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.msg{max-width:85%;padding:9px 14px;border-radius:18px;border:2px solid var(--line);font-weight:500;animation:pop .25s;background:var(--card2);overflow-wrap:anywhere}
+.me{align-self:flex-end;background:var(--blue);color:#1d1340}
+.ai{align-self:flex-start}
+.ai.YES{background:var(--yes);color:#0b2e25;font-family:var(--head);font-weight:800;font-size:20px}
+.ai.NO{background:var(--no);color:#fff;font-family:var(--head);font-weight:800;font-size:20px}
+.sys{align-self:center;font-size:13px;color:var(--muted);font-weight:700}
+.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+input{flex:1;min-width:0;font:500 16px var(--body);color:var(--ink);background:var(--card2);border:3px solid var(--line);border-radius:14px;padding:12px 14px;outline:none}
+input:focus{box-shadow:0 0 0 4px var(--pop)}
+.guessbox{margin-top:16px;padding-top:14px;border-top:3px dashed var(--line)}
+.guessbox label{font-weight:700;font-size:13px;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:6px}
+.guessbox .row button{flex:1;min-width:150px}
+.end{text-align:center}
+.end h2{font-family:var(--head);font-weight:800;font-size:clamp(26px,7vw,44px);margin:0 0 4px}
+.reveal{font-family:var(--head);font-weight:800;font-size:clamp(28px,8vw,52px);background:linear-gradient(90deg,var(--no),var(--pop),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent;margin:6px 0}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.stat{background:var(--card2);border:3px solid var(--line);border-radius:16px;padding:8px 16px}
+.stat b{display:block;font-family:var(--head);font-size:30px}
+.stat span{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px}
+.tr{text-align:left;margin:14px 0;display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto}
+.tl{display:flex;gap:10px;align-items:center;background:var(--card2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:500}
+.tl .n{font-family:var(--head);font-weight:800;color:var(--muted);min-width:24px}
+.tl .t{flex:1;overflow-wrap:anywhere}
+.tag{font-family:var(--head);font-weight:800;border-radius:10px;padding:2px 10px;border:2px solid var(--line);white-space:nowrap;color:#1d1340}
+.tag.YES,.tag.OK{background:var(--yes)}.tag.NO,.tag.BAD{background:var(--no);color:#fff}
+.b-two{margin-top:12px;background:linear-gradient(90deg,#6ee7ff,#a78bfa)}
+.banner{background:linear-gradient(90deg,var(--pop),var(--no));color:#1d1340;border:3px solid var(--line);border-radius:14px;padding:8px 12px;font-weight:700;margin-bottom:10px;text-align:center;overflow-wrap:anywhere}
+.mini{font-size:13px;padding:4px 10px;margin-left:8px;border-radius:10px;box-shadow:2px 2px 0 var(--line);background:var(--card2)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="bg p1" id="bg"></div>
+<div class="wrap">
+<header><div class="top">
+<h1>Who Am I?<br><span>Reverse Edition</span></h1>
+<div class="strikes"><small>STRIKES</small><div class="num" id="strikes">0</div><div class="pips" id="pips"></div></div>
+</div></header>
+
+<section class="card mystery" id="home">
+<div class="q">?</div>
+<p>A famous mystery person is waiting. Ask YES or NO questions to work out who it is, and rack up as few strikes as you can.</p>
+<button class="b-start" id="start">🎲 Solo: get a random famous person</button>
+<button class="b-start b-two" id="two">👥 2 Players: show the mystery person</button>
+</section>
+
+<section class="card hide" id="game">
+<div class="banner hide" id="banner"><span id="btext"></span><button class="mini" id="btog">Hide</button></div>
+<div class="mystery" style="margin-bottom:10px"><b style="font-family:var(--head);font-size:20px">🕵️ Mystery person locked in!</b></div>
+<div class="chat" id="chat" aria-live="polite"></div>
+<div class="row">
+<input id="qin" placeholder="Ask a yes/no question, e.g. Are they a sportsperson?" maxlength="200" autocomplete="off">
+<button class="b-ask" id="ask">Ask ➜</button>
+</div>
+<div class="guessbox">
+<label for="gin">THINK YOU KNOW? (OPTIONAL: TYPE YOUR GUESS)</label>
+<input id="gin" placeholder="Your guess…" maxlength="80" autocomplete="off">
+<div class="row">
+<button class="b-bad" id="bad">❌ INCORRECT GUESS (+2)</button>
+<button class="b-good" id="good">🎉 GUESSED CORRECTLY!</button>
+</div>
+</div>
+</section>
+
+<section class="card end hide" id="over">
+<h2>🏆 You got it!</h2>
+<div>The mystery person was</div>
+<div class="reveal" id="who"></div>
+<div class="stats">
+<div class="stat"><b id="sq">0</b><span>QUESTIONS ASKED</span></div>
+<div class="stat"><b id="sg">0</b><span>WRONG GUESSES</span></div>
+<div class="stat"><b id="ss">0</b><span>TOTAL STRIKES</span></div>
+</div>
+<h3 style="font-family:var(--head);margin:14px 0 0">Transcript</h3>
+<div class="tr" id="tr"></div>
+<button class="b-start" id="again">🔁 Play again</button>
+</section>
+</div>
+
+<script>
+const PEOPLE=["Cristiano Ronaldo","Lionel Messi","Taylor Swift","Beyoncé","Elon Musk","Albert Einstein","Michael Jackson","Serena Williams","LeBron James","Barack Obama","Oprah Winfrey","Leonardo DiCaprio","Rihanna","Dwayne Johnson","Marilyn Monroe","Nelson Mandela","Steve Jobs","Bill Gates","Oprah Winfrey","Mahatma Gandhi","Queen Elizabeth II","Usain Bolt","Roger Federer","Michael Jordan","Muhammad Ali","Lady Gaga","Ed Sheeran","Adele","Keanu Reeves","Tom Hanks","Meryl Streep","Will Smith","Emma Watson","Zendaya","Tom Holland","Margot Robbie","Hugh Jackman","Chris Hemsworth","Ariana Grande","Kim Kardashian","Mark Zuckerberg","Jeff Bezos","Greta Thunberg","Malala Yousafzai","Stephen Hawking","Leonardo da Vinci","William Shakespeare","Pablo Picasso","Freddie Mercury","Elvis Presley","David Beckham","Neymar Jr","Kylian Mbappé","Simone Biles","Tiger Woods","Novak Djokovic","Shakira","Bruno Mars","Eminem","Jackie Chan"];
+const $=id=>document.getElementById(id);
+let person=null,log=[],busy=false,pat=1;
+const strikes=()=>log.reduce((s,e)=>s+(e.type==='q'?1:e.type==='bad'?2:0),0);
+function renderStrikes(){
+  $('strikes').textContent=strikes();
+  const p=$('pips');p.textContent='';
+  log.forEach(e=>{const n=e.type==='q'?1:e.type==='bad'?2:0;for(let i=0;i<n;i++){const d=document.createElement('div');d.className='pip'+(e.type==='bad'?' x':'');p.appendChild(d);}});
+}
+function say(cls,text){const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;$('chat').appendChild(d);$('chat').scrollTop=1e6;return d;}
+function setBg(){pat=pat%4+1;$('bg').className='bg p'+pat;}
+function start(p){
+  person=(typeof p==='string')?p:PEOPLE[Math.floor(Math.random()*PEOPLE.length)];
+  log=[];setBg();renderStrikes();
+  $('chat').textContent='';
+  say('sys','Ask away! I only answer YES or NO.');
+  $('home').classList.add('hide');$('over').classList.add('hide');$('game').classList.remove('hide');
+  $('qin').value='';$('gin').value='';$('qin').focus();
+}
+async function ask(){
+  const q=$('qin').value.trim();
+  if(!q||busy||!person)return;
+  busy=true;$('ask').disabled=true;$('qin').value='';
+  say('me',q);
+  const thinking=say('ai','Checking the sources…');
+  let ans='NO';
+  try{
+    const sample=await claude.use('sample');
+    if(!sample)throw new Error('unavailable');
+    const r=await sample(
+      "You are the answer-keeper in a guessing game. The secret famous person is: "+person+".\n"+
+      "Answer the player's question about this person using well-documented facts from credible sources (e.g. encyclopedias, major news outlets, official biographies). "+
+      "Reply with exactly one word: YES or NO. If the question cannot be answered with yes or no (for example it starts with Who, What, Where, When, Why or How, asks you to name or describe the person, or is not a question at all), reply INVALID. If it is a valid yes/no question but the facts say it does not apply, reply NO. "+
+      "Never reveal the name or give any other text.\n\nPlayer's question: "+q,
+      {cache:false,modelTier:'quick'});
+    const t=(r.text||'').trim();
+    if(/^\W*invalid/i.test(t)){
+      thinking.className='msg sys';
+      thinking.textContent='🙅 I can only answer YES or NO questions. Try rephrasing it, e.g. “Are they an actor?” (no strike added)';
+    }else{
+      ans=/^\W*yes/i.test(t)?'YES':'NO';
+      thinking.className='msg ai '+ans;thinking.textContent=ans;
+      log.push({type:'q',text:q,ans});
+    }
+  }catch(e){
+    thinking.className='msg sys';
+    thinking.textContent='The AI could not answer that one. Try again (no strike added).';
+    if(e&&e.code==='not_granted')thinking.textContent='AI access was declined, so I cannot answer questions.';
+  }
+  renderStrikes();busy=false;$('ask').disabled=false;$('qin').focus();
+}
+function bad(){
+  if(!person)return;
+  const g=$('gin').value.trim()||'(guess not typed)';
+  log.push({type:'bad',text:g});$('gin').value='';
+  say('sys','❌ Incorrect guess: '+g+' (+2 strikes)');
+  renderStrikes();
+}
+function good(){
+  if(!person)return;
+  const g=$('gin').value.trim();
+  log.push({type:'good',text:g||person});
+  finish();
+}
+function finish(){
+  $('game').classList.add('hide');$('over').classList.remove('hide');
+  $('who').textContent=person;
+  $('sq').textContent=log.filter(e=>e.type==='q').length;
+  $('sg').textContent=log.filter(e=>e.type==='bad').length;
+  $('ss').textContent=strikes();
+  const tr=$('tr');tr.textContent='';
+  log.forEach((e,i)=>{
+    const row=document.createElement('div');row.className='tl';
+    const n=document.createElement('span');n.className='n';n.textContent=(i+1)+'.';
+    const t=document.createElement('span');t.className='t';
+    const tag=document.createElement('span');
+    if(e.type==='q'){t.textContent='Q: '+e.text;tag.className='tag '+e.ans;tag.textContent=e.ans;}
+    else if(e.type==='bad'){t.textContent='Guess: '+e.text;tag.className='tag BAD';tag.textContent='WRONG +2';}
+    else{t.textContent='Guess: '+e.text;tag.className='tag OK';tag.textContent='CORRECT 🎉';}
+    row.append(n,t,tag);tr.appendChild(row);
+  });
+  person=null;setBg();
+}
+let shown=true,pname='';
+function paintBanner(){$('btext').textContent=shown?'\ud83d\udc40 The mystery person is: '+pname:'\ud83d\ude48 Mystery person hidden';$('btog').textContent=shown?'Hide':'Show';}
+function solo(){$('banner').classList.add('hide');start();}
+function twoPlayer(){
+  const p=PEOPLE[Math.floor(Math.random()*PEOPLE.length)];
+  start(p);pname=p;shown=true;paintBanner();$('banner').classList.remove('hide');
+}
+function goHome(){['game','over','banner'].forEach(i=>$(i).classList.add('hide'));$('home').classList.remove('hide');}
+$('start').onclick=solo;$('two').onclick=twoPlayer;$('again').onclick=goHome;
+$('btog').onclick=()=>{shown=!shown;paintBanner();};
+$('ask').onclick=ask;$('bad').onclick=bad;$('good').onclick=good;
+$('qin').addEventListener('keydown',e=>{if(e.key==='Enter')ask();});
+$('gin').addEventListener('keydown',e=>{if(e.key==='Enter')bad();});
+</script>
+</body>
+</html>
