@@ -157,12 +157,19 @@ function start(p){
   $('home').classList.add('hide');$('over').classList.add('hide');$('game').classList.remove('hide');
   $('qin').value='';$('gin').value='';$('qin').focus();
 }
+// Paste your Cloudflare Worker address here (see worker.js). Leave empty to use the per-browser API key box instead.
+const PROXY_URL='https://who-am-i.joyb02.workers.dev/';
 const KEYN='wai_key';
 function getKey(){try{return localStorage.getItem(KEYN)||'';}catch(e){return '';}}
-async function askAI(prompt){
+async function askAI(prompt,question){
   let sample=null;
   try{if(window.claude&&claude.use)sample=await claude.use('sample');}catch(e){}
   if(sample){const r=await sample(prompt,{cache:false,modelTier:'quick'});return r.text||'';}
+  if(PROXY_URL){
+    const res=await fetch(PROXY_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({person:person,question:question})});
+    if(!res.ok){const e=new Error('http '+res.status);e.code='http';throw e;}
+    return (await res.json()).text||'';
+  }
   const key=getKey();
   if(!key){const e=new Error('no key');e.code='no_key';throw e;}
   const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
@@ -172,7 +179,7 @@ async function askAI(prompt){
   const d=await res.json();
   return (d.content||[]).map(c=>c.text||'').join('');
 }
-if(window.claude&&claude.use)$('keybox').classList.add('hide');
+if((window.claude&&claude.use)||PROXY_URL)$('keybox').classList.add('hide');
 $('ksave').onclick=()=>{const v=$('kin').value.trim();try{localStorage.setItem(KEYN,v);$('kmsg').textContent=v?'Saved on this device ✓':'Key cleared';}catch(e){$('kmsg').textContent='Could not save the key in this browser.';}$('kin').value='';};
 async function ask(){
   const q=$('qin').value.trim();
@@ -186,7 +193,7 @@ async function ask(){
       "You are the answer-keeper in a guessing game. The secret famous person is: "+person+".\n"+
       "Answer the player's question about this person using well-documented facts from credible sources (e.g. encyclopedias, major news outlets, official biographies). "+
       "Reply with exactly one word: YES or NO. If the question cannot be answered with yes or no (for example it starts with Who, What, Where, When, Why or How, asks you to name or describe the person, or is not a question at all), reply INVALID. If it is a valid yes/no question but the facts say it does not apply, reply NO. "+
-      "Never reveal the name or give any other text.\n\nPlayer's question: "+q);
+      "Never reveal the name or give any other text.\n\nPlayer's question: "+q,q);
     const t=(raw||'').trim();
     if(/^\W*invalid/i.test(t)){
       thinking.className='msg sys';
