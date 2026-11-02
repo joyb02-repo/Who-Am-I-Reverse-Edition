@@ -109,7 +109,7 @@ input:focus{box-shadow:0 0 0 4px var(--pop)}
 <button class="b-ask" id="ask">Ask ➜</button>
 </div>
 <div class="guessbox">
-<label for="gin">THINK YOU KNOW? (OPTIONAL: TYPE YOUR GUESS)</label>
+<label for="gin">THINK YOU KNOW? TYPE A NAME (A SURNAME IS FINE) AND PRESS ENTER</label>
 <input id="gin" placeholder="Your guess…" maxlength="80" autocomplete="off">
 <div class="row">
 <button class="b-bad" id="bad">❌ INCORRECT GUESS (+2)</button>
@@ -161,6 +161,16 @@ function start(p){
 const PROXY_URL='https://who-am-i.joyb02.workers.dev/';
 const KEYN='wai_key';
 function getKey(){try{return localStorage.getItem(KEYN)||'';}catch(e){return '';}}
+function buildPrompt(p,q){return `You are the answer-keeper in a guessing game. The secret famous person is: ${p}.
+The player asks a question to work out who it is. Judge it using well-documented facts from credible sources (encyclopedias, major news outlets, official biographies).
+Rules:
+- Treat short fragments such as "female?" or "a singer?" as the yes/no question they imply ("Are they female?", "Are they a singer?").
+- Questions about gender, nationality, profession, age, whether they are alive, and similar facts are valid. Answer YES if it is true of this person and NO if it is not. Be literal and accurate.
+- If the question cannot be answered with yes or no (it asks Who, What, Where, When, Why or How, asks you to name or describe the person, or is not a question at all), the answer is INVALID.
+- Never reveal the name.
+Think for one or two short sentences about the facts, then write the final line exactly as ANSWER: YES, ANSWER: NO or ANSWER: INVALID.
+
+Player's question: ${q}`;}
 async function askAI(prompt,question){
   let sample=null;
   try{if(window.claude&&claude.use)sample=await claude.use('sample');}catch(e){}
@@ -174,7 +184,7 @@ async function askAI(prompt,question){
   if(!key){const e=new Error('no key');e.code='no_key';throw e;}
   const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
     headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-haiku-5-5',max_tokens:10,messages:[{role:'user',content:prompt}]})});
+    body:JSON.stringify({model:'claude-haiku-5-5',max_tokens:200,messages:[{role:'user',content:prompt}]})});
   if(!res.ok){const e=new Error('http '+res.status);e.code=(res.status===401||res.status===403)?'bad_key':'http';throw e;}
   const d=await res.json();
   return (d.content||[]).map(c=>c.text||'').join('');
@@ -189,12 +199,10 @@ async function ask(){
   const thinking=say('ai','Checking the sources…');
   let ans='NO';
   try{
-    const raw=await askAI(
-      "You are the answer-keeper in a guessing game. The secret famous person is: "+person+".\n"+
-      "Answer the player's question about this person using well-documented facts from credible sources (e.g. encyclopedias, major news outlets, official biographies). "+
-      "Reply with exactly one word: YES or NO. If the question cannot be answered with yes or no (for example it starts with Who, What, Where, When, Why or How, asks you to name or describe the person, or is not a question at all), reply INVALID. If it is a valid yes/no question but the facts say it does not apply, reply NO. "+
-      "Never reveal the name or give any other text.\n\nPlayer's question: "+q,q);
-    const t=(raw||'').trim();
+    const raw=await askAI(buildPrompt(person,q),q);
+    const mm=[...(raw||'').matchAll(/ANSWER:\s*\**\s*(YES|NO|INVALID)/gi)];
+    if(!mm.length)throw new Error('unparsed');
+    const t=mm[mm.length-1][1];
     if(/^\W*invalid/i.test(t)){
       thinking.className='msg sys';
       thinking.textContent='🙅 I can only answer YES or NO questions. Try rephrasing it, e.g. “Are they an actor?” (no strike added)';
@@ -212,9 +220,25 @@ async function ask(){
   }
   renderStrikes();busy=false;$('ask').disabled=false;$('qin').focus();
 }
+const ALIAS={"Dwayne Johnson":["the rock"],"Cristiano Ronaldo":["cr7"],"Lionel Messi":["leo messi"],"Queen Elizabeth II":["the queen"],"Muhammad Ali":["cassius clay"]};
+const SKIPW=['jr','sr','ii','iii'];
+const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+function lev(a,b){const d=[];for(let i=0;i<=a.length;i++){d[i]=[i];}for(let j=1;j<=b.length;j++)d[0][j]=j;
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length];}
+function isMatch(guess,name){
+  const g=norm(guess).split(' ').filter(t=>t&&!SKIPW.includes(t)).join(' ');
+  if(!g)return false;
+  const toks=norm(name).split(' ').filter(t=>!SKIPW.includes(t));
+  const cands=new Set([norm(name)]);
+  for(let i=0;i<toks.length;i++)cands.add(toks.slice(i).join(' '));
+  (ALIAS[name]||[]).forEach(a=>cands.add(norm(a)));
+  for(const c of cands){const tol=c.length>=9?2:c.length>=5?1:0;if(lev(g,c)<=tol)return true;}
+  return false;
+}
 function bad(){
   if(!person)return;
   const g=$('gin').value.trim()||'(guess not typed)';
+  if(g!=='(guess not typed)'&&isMatch(g,person)){log.push({type:'good',text:g});finish();return;}
   log.push({type:'bad',text:g});$('gin').value='';
   say('sys','❌ Incorrect guess: '+g+' (+2 strikes)');
   renderStrikes();
@@ -256,7 +280,7 @@ $('start').onclick=solo;$('two').onclick=twoPlayer;$('again').onclick=goHome;
 $('btog').onclick=()=>{shown=!shown;paintBanner();};
 $('ask').onclick=ask;$('bad').onclick=bad;$('good').onclick=good;
 $('qin').addEventListener('keydown',e=>{if(e.key==='Enter')ask();});
-$('gin').addEventListener('keydown',e=>{if(e.key==='Enter')bad();});
+$('gin').addEventListener('keydown',e=>{if(e.key==='Enter'&&$('gin').value.trim())bad();});
 </script>
 </body>
 </html>
